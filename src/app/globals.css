@@ -1,26 +1,171 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --color-paper: #f7f4ee;
+  --color-ink: #0f1b2d;
+  --color-ink-soft: #3c4757;
+  --color-sage: #5e7d6a;
+  --color-sage-deep: #4a6655;
+  --color-sand: #e8dcc8;
+  --color-line: rgb(15 27 45 / 0.12);
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --radius-card: 24px;
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-marquee: marquee 48s linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* Lenis takes over scrolling when active */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+html.lenis {
+  scroll-behavior: auto;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle film grain */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: var(--color-sand);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-sage);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+.on-dark :focus-visible {
+  outline-color: var(--color-sand);
+}
+
+/* When the scroll-driven background is active, sections let the body color show through */
+html.bg-driven [data-bg] {
+  background-color: transparent !important;
+}
+
+/* Pinned "How it works": steps stack in one cell and crossfade */
+html.pin-ok .steps-stack {
+  display: grid;
+}
+html.pin-ok .steps-stack > [data-step] {
+  grid-area: 1 / 1;
+  border: 0;
+  padding-top: 0;
+}
+
+@media (min-width: 1024px) {
+  html:not(.pin-ok) .how-intro {
+    position: sticky;
+    top: 7rem;
+    align-self: start;
+  }
+}
+
+/* Masked line reveal: <span class="line"><span>Text</span></span> */
+.line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.line > span {
+  display: inline-block;
+  will-change: transform;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Desaturated map */
+.map-frame iframe {
+  filter: grayscale(1) contrast(0.92) brightness(1.04) sepia(0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .marquee-track {
+    animation: none !important;
+  }
+}
+
+/* Print: only the document checklist */
+@media print {
+  body::after,
+  body > *:not(main),
+  main > *:not(#checklist),
+  #checklist .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+  #checklist {
+    background: #fff !important;
+    padding: 0 !important;
+  }
+  #checklist [role="tabpanel"] {
+    display: block !important;
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+  }
+  #checklist .print-only {
+    display: block !important;
+  }
+  #checklist .item-detail {
+    grid-template-rows: 1fr !important;
+  }
 }
